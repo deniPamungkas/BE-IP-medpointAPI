@@ -9,15 +9,18 @@ import (
 )
 
 type ScheduleRequest struct {
-	Id           string `path:"id"`
-	DoctorId     *uuid.UUID
+	DoctorId     *uuid.UUID `json:"doctor_id"`
 	AvailableDay string `json:"available_day"`
 	StartTime    string `json:"start_time"`
 	EndTime      string `json:"end_time"`
 }
 
-type DeleteScheduleRequest struct {
+type ScheduleRequestWithId struct {
 	Id string `path:"id"`
+	DoctorId     *uuid.UUID
+	AvailableDay string `json:"available_day"`
+	StartTime    string `json:"start_time"`
+	EndTime      string `json:"end_time"`
 }
 
 type ScheduleResponse struct {
@@ -33,18 +36,11 @@ type ScheduleController struct {
 	Payload *ScheduleRequest
 }
 
-type DeleteScheduleController struct {
+type ScheduleControllerWithId struct {
 	raiden.ControllerBase
 	Http    string `path:"/doctor-schedule/{id}" type:"custom"`
 	Model   models.DoctorSchedule
-	Payload *DeleteScheduleRequest
-}
-
-type UpdateScheduleController struct {
-	raiden.ControllerBase
-	Http    string `path:"/doctor-schedule/{id}" type:"custom"`
-	Model   models.DoctorSchedule
-	Payload *ScheduleRequest
+	Payload *ScheduleRequestWithId
 }
 
 // get all doctor schedule
@@ -65,9 +61,24 @@ func (c *ScheduleController) Get(ctx raiden.Context) error {
 	return ctx.SendJson(response)
 }
 
+// get doctor schedule by id
+func (c *ScheduleControllerWithId) Get(ctx raiden.Context) error {
+	doctorSchedule := models.DoctorSchedule{}
+	err := db.NewQuery(ctx).From(models.DoctorSchedule{}).Eq("doctor_id", c.Payload.Id).Single(&doctorSchedule)
+	if err != nil {
+		return ctx.SendError(err.Error())
+	}
+	response := DoctorResponse{
+		Success: true,
+		Data:    doctorSchedule,
+		Message: "success",
+	}
+	return ctx.SendJson(response)
+}
+
 // add new doctor schedule
 func (c *ScheduleController) Post(ctx raiden.Context) error {
-	payload := models.DoctorSchedule{AvailableDay: c.Payload.AvailableDay, StartTime: c.Payload.StartTime, EndTime: c.Payload.EndTime}
+	payload := models.DoctorSchedule{AvailableDay: c.Payload.AvailableDay, StartTime: c.Payload.StartTime, EndTime: c.Payload.EndTime, DoctorId: *c.Payload.DoctorId}
 	var insertedDoctorSchedule any
 	err := db.NewQuery(ctx).From(models.DoctorSchedule{}).Insert(&payload, &insertedDoctorSchedule)
 	if err != nil {
@@ -82,7 +93,7 @@ func (c *ScheduleController) Post(ctx raiden.Context) error {
 }
 
 // delete doctor schedule
-func (c *DeleteScheduleController) Delete(ctx raiden.Context) error {
+func (c *ScheduleControllerWithId) Delete(ctx raiden.Context) error {
 
 	err := db.NewQuery(ctx).From(models.DoctorSchedule{}).Eq("id", c.Payload.Id).Delete()
 
@@ -100,7 +111,7 @@ func (c *DeleteScheduleController) Delete(ctx raiden.Context) error {
 }
 
 // edit doctor schedule
-func (c *UpdateScheduleController) Put(ctx raiden.Context) error {
+func (c *ScheduleControllerWithId) Patch(ctx raiden.Context) error {
 
 	payload := models.DoctorSchedule{AvailableDay: c.Payload.AvailableDay, StartTime: c.Payload.StartTime, EndTime: c.Payload.EndTime}
 

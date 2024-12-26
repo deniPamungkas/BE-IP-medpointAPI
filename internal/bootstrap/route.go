@@ -29,22 +29,15 @@ func RegisterRoute(server *raiden.Server) {
 		{
 			Type:       raiden.RouteTypeCustom,
 			Path:       "/doctor-schedule/{id}",
-			Methods:    []string{fasthttp.MethodPut},
-			Controller: &controllers.UpdateScheduleController{},
-			Model:      models.DoctorSchedule{},
-		},
-		{
-			Type:       raiden.RouteTypeCustom,
-			Path:       "/doctor-schedule/{id}",
-			Methods:    []string{fasthttp.MethodDelete},
-			Controller: &controllers.DeleteScheduleController{},
+			Methods:    []string{fasthttp.MethodGet, fasthttp.MethodDelete, fasthttp.MethodPatch},
+			Controller: &controllers.ScheduleControllerWithId{},
 			Model:      models.DoctorSchedule{},
 		},
 		{
 			Type:       raiden.RouteTypeCustom,
 			Path:       "/doctor/{id}",
-			Methods:    []string{fasthttp.MethodDelete},
-			Controller: &controllers.DeleteDoctorController{},
+			Methods:    []string{fasthttp.MethodGet, fasthttp.MethodDelete, fasthttp.MethodPatch},
+			Controller: &controllers.DoctorControllerWithId{},
 			Model:      models.Doctors{},
 		},
 		{
@@ -52,6 +45,13 @@ func RegisterRoute(server *raiden.Server) {
 			Path:       "/hello",
 			Methods:    []string{fasthttp.MethodGet},
 			Controller: &controllers.HelloWorldController{},
+		},
+		{
+			Type:       raiden.RouteTypeCustom,
+			Path:       "/user/{id}",
+			Methods:    []string{fasthttp.MethodGet},
+			Controller: &controllers.UserController{},
+			Model:      models.PublicUsers{},
 		},
 	})
 }

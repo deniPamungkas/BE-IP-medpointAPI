@@ -10,5 +10,7 @@ func RegisterModels() {
 	resource.RegisterModels(
 		&models.DoctorSchedule{},
 		&models.Doctors{},
+		&models.PublicUsers{},
+		&models.Specialization{},
 	)
 }
