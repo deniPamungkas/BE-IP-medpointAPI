@@ -63,8 +63,8 @@ func (c *ScheduleController) Get(ctx raiden.Context) error {
 
 // get doctor schedule by id
 func (c *ScheduleControllerWithId) Get(ctx raiden.Context) error {
-	doctorSchedule := models.DoctorSchedule{}
-	err := db.NewQuery(ctx).From(models.DoctorSchedule{}).Eq("doctor_id", c.Payload.Id).Single(&doctorSchedule)
+	var doctorSchedule []models.DoctorSchedule
+	err := db.NewQuery(ctx).From(models.DoctorSchedule{}).Eq("doctor_id", c.Payload.Id).Get(&doctorSchedule)
 	if err != nil {
 		return ctx.SendError(err.Error())
 	}
