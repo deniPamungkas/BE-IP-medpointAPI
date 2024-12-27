@@ -118,7 +118,7 @@ func (c *DoctorControllerWithId) Patch(ctx raiden.Context) error {
 
 	payload := models.Doctors{Name: c.Payload.Name, Gender: c.Payload.Gender, SpecializationId: c.Payload.SpecializationId, UserId: c.Payload.UserId}
 
-	var updatedDoctor any
+	var updatedDoctor []models.Doctors
 
 	err := db.NewQuery(ctx).From(models.Doctors{}).Eq("id", c.Payload.Id).Update(payload, &updatedDoctor)
 

@@ -29,6 +29,11 @@ type ScheduleResponse struct {
 	Message string
 }
 
+type ErrorResponse struct{
+	Code int
+	Message string `json:"message"`
+}
+
 type ScheduleController struct {
 	raiden.ControllerBase
 	Http    string `path:"/doctor-schedule" type:"custom"`
@@ -48,6 +53,7 @@ func (c *ScheduleController) Get(ctx raiden.Context) error {
 	var schedules []models.DoctorSchedule
 
 	err := db.NewQuery(ctx).From(models.DoctorSchedule{}).Get(&schedules)
+	// httpResponse := &context.raidenContext
 
 	if err != nil {
 		return ctx.SendError(err.Error())
@@ -55,7 +61,7 @@ func (c *ScheduleController) Get(ctx raiden.Context) error {
 
 	response := ScheduleResponse{
 		Success: true,
-		Data:    schedules,
+		Data:    err,
 		Message: "success",
 	}
 	return ctx.SendJson(response)
